@@ -42,6 +42,9 @@ class Board:
     def set_value(self, row, col, value):
         """Set the value for the square at (row, col)."""
         self.board[row][col].set_value(value)
+        self._remove_possible_row(row, value)
+        self._remove_possible_col(col, value)
+        self._remove_possible_inner_square(row, col, value)
 
     def get_minimal_possibilities_square(self):
         """Return (row, col) of a square with minimal remaining possibilities."""
@@ -62,21 +65,9 @@ class Board:
         possible_vals = self.board[row][col].get_possible()
         for val in possible_vals:
             new_board = self.deep_copy()
-            new_board.board[row][col].set_value(val)
-            new_board._remove_possible_row(row, val)
-            new_board._remove_possible_col(col, val)
-            new_board._remove_possible_inner_square(row, col, val)
+            new_board.set_value(row, col, val)
             possible_boards.append(new_board)
         return possible_boards
-
-    def fix_board(self):
-        """Account for all of the existing values on an input board in the other val possibilities."""
-        for r, line in enumerate(self.board):
-            for c, val in enumerate(line):
-                if val.is_set():
-                    self._remove_possible_row(r, val.value)
-                    self._remove_possible_col(c, val.value)
-                    self._remove_possible_inner_square(r, c, val.value)
 
     def is_complete(self):
         """Check if all values are set, then the board is complete."""
